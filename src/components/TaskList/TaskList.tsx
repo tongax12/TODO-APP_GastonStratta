@@ -1,5 +1,6 @@
-import type { Task, TaskStatus } from "../../../types/task";
-import { TaskItem } from "./TaskItem";
+import type { Task, TaskStatus } from "../../types/task";
+import { TaskItem } from "../TaskItem/TaskItem";
+
 import "./TaskList.css";
 
 interface TaskListProps {
