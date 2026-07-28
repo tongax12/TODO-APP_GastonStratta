@@ -1,5 +1,6 @@
 import {
   addDoc, collection, deleteDoc, doc,
+  FirestoreError,
   getDocs, orderBy, query, updateDoc, where,
 } from "firebase/firestore";
 import { db } from "./firebase";
@@ -12,8 +13,9 @@ const TASKS_COLLECTION = "tasks";
  * como sí hacía la versión con onSnapshot). Quien la use tiene que volver a
  * llamarla si quiere datos frescos, por ejemplo después de crear/editar/borrar.
  */
-export async function getTasksByUser(userId: string): Promise<Task[]> {
-  const tasksQuery = query(
+export async function subscribeToTasks(userId: string): Promise<Task[]> {
+ try {
+   const tasksQuery = query(
     collection(db, TASKS_COLLECTION),
     where("userId", "==", userId),
     orderBy("createdAt", "desc")
@@ -24,6 +26,16 @@ export async function getTasksByUser(userId: string): Promise<Task[]> {
   return snapshot.docs.map(
     (docSnap) => ({ id: docSnap.id, ...docSnap.data() } as Task)
   );
+ } catch (error) {
+  const err = error as FirestoreError;
+
+  if(err.code === "permission-denied"){
+    throw new Error ("No tenes permiso para acceder a estas tareas.");
+  }
+
+throw error;
+
+ }
 }
 
 export async function createTask(userId: string, data: TaskFormData) {
