@@ -1,0 +1,20 @@
+/* Base: mobile-first, pensado desde 320px hacia arriba */
+.tasks-page {
+  min-height: 100vh;
+  background: var(--color-bg);
+  padding: 1rem 0.75rem 2rem;
+}
+
+/* ---------- Tablet: 720px en adelante ---------- */
+@media (min-width: 720px) {
+  .tasks-page {
+    padding: 1.5rem 1.5rem 2.5rem;
+  }
+}
+
+/* ---------- Desktop: 1080px en adelante ---------- */
+@media (min-width: 1080px) {
+  .tasks-page {
+    padding: 2rem 2rem 3rem;
+  }
+}
