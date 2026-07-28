@@ -1,0 +1,64 @@
+/* Base: mobile-first, pensado desde 320px hacia arriba */
+.email-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.email-summary button {
+  padding: 0.65rem 1rem;
+  border: none;
+  border-radius: 9px;
+  background: var(--color-primary);
+  color: var(--color-surface);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.05s ease;
+}
+
+.email-summary button:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.email-summary button:active:not(:disabled) {
+  transform: scale(0.99);
+}
+
+.email-summary button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.email-summary__status--success {
+  font-size: 0.82rem;
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.email-summary__status--error {
+  font-size: 0.82rem;
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+/* ---------- Tablet: 720px en adelante ---------- */
+@media (min-width: 720px) {
+  .email-summary {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .email-summary button {
+    padding: 0.7rem 1.2rem;
+  }
+}
+
+/* ---------- Desktop: 1080px en adelante ---------- */
+@media (min-width: 1080px) {
+  .email-summary button:hover:not(:disabled) {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  }
+}
