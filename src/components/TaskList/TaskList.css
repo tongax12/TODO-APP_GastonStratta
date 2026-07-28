@@ -8,6 +8,15 @@
   gap: 0.65rem;
 }
 
+/* Alineamos horizontalmente la lista con el contenido interno del
+   bloque de filtros (mismo padding que .filtered-task-list__filters) */
+.task-list {
+  box-sizing: border-box;
+  padding-left: 0.85rem;
+  padding-right: 0.85rem;
+  width: 100%;
+}
+
 .task-list__status {
   margin: 0;
   text-align: center;
@@ -38,5 +47,19 @@
 @media (min-width: 1080px) {
   .task-list {
     gap: 0.85rem;
+  }
+}
+
+@media (min-width: 720px) {
+  .task-list {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+@media (min-width: 1080px) {
+  .task-list {
+    padding-left: 1.1rem;
+    padding-right: 1.1rem;
   }
 }

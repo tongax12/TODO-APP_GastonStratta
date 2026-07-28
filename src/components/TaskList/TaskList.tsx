@@ -1,7 +1,7 @@
 import type { Task, TaskStatus } from "../../types/task";
 import { TaskItem } from "../TaskItem/TaskItem";
 
-//import "./TaskList.css";
+import "./TaskList.css";
 
 interface TaskListProps {
   tasks: Task[];

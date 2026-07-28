@@ -19,11 +19,6 @@ const STATUS_LABEL: Record<TaskStatus, string> = {
   completed: "Completada",
 };
 
-/**
- * TaskItem no sabe nada de Firestore ni de useState propio: es "tonto" a
- * propósito. Toda acción sube por callbacks (props) para que TaskList decida
- * qué hacer, lo que lo hace fácil de reusar y de testear.
- */
 export function TaskItem({ task, onToggleStatus, onEdit, onDelete }: TaskItemProps) {
   const isCompleted = task.status === "completed";
 
@@ -33,19 +28,23 @@ export function TaskItem({ task, onToggleStatus, onEdit, onDelete }: TaskItemPro
 
   return (
     <li className={`task-item task-item--${task.priority}`}>
-      <label className="task-item__checkbox">
-        <input
-          type="checkbox"
-          checked={isCompleted}
-          onChange={handleCheckboxChange}
-          aria-label={`Marcar "${task.title}" como ${isCompleted ? "pendiente" : "completada"}`}
-        />
-      </label>
-
       <div className="task-item__body">
-        <p className={`task-item__title ${isCompleted ? "task-item__title--done" : ""}`}>
-          {task.title}
-        </p>
+        {/* Checkbox y título ahora van juntos en la misma fila, en cualquier
+            tamaño de pantalla, en vez de que el checkbox quede arriba suelto. */}
+        <div className="task-item__header">
+          <label className="task-item__checkbox">
+            <input
+              type="checkbox"
+              checked={isCompleted}
+              onChange={handleCheckboxChange}
+              aria-label={`Marcar "${task.title}" como ${isCompleted ? "pendiente" : "completada"}`}
+            />
+          </label>
+          <p className={`task-item__title ${isCompleted ? "task-item__title--done" : ""}`}>
+            {task.title}
+          </p>
+        </div>
+
         {task.description && (
           <p className="task-item__description">{task.description}</p>
         )}
