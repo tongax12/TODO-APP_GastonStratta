@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../services/firebase";
 import "./Login.css";
+import { validateLogin } from "../../utils/validators/loginValidator";
 
 export function Login() {
   const [email, setEmail] = useState("");
@@ -18,10 +19,9 @@ export function Login() {
     e.preventDefault();
     setError(null);
 
-    if (!email.trim() || !password) {
-      setError("Completá email y contraseña.");
-      return;
-    }
+    const error = validateLogin({ email, password });
+    if (error) { setError(error); return; }
+
 
     setIsSubmitting(true);
     try {

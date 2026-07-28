@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../services/firebase";
 import "./Register.css";
+import { validateRegister } from "../../utils/validators/registerValidator";
 
 export function Register() {
   const [email, setEmail] = useState("");
@@ -13,30 +14,19 @@ export function Register() {
 
   const navigate = useNavigate();
 
-  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
 
-    if (!email.trim() || !password || !confirmPassword) {
-      setError("Completá todos los campos.");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError("Las contraseñas no coinciden.");
-      return;
-    }
-
-    if (password.length < 6) {
-      setError("La contraseña debe tener al menos 6 caracteres.");
-      return;
-    }
+    const error = validateRegister({ email, password, confirmPassword });
+    if (error) { setError(error); return; }
 
     setIsSubmitting(true);
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       navigate("/tasks", { replace: true });
     } catch (err) {
+      console.error("Error al crear cuenta:", err);
       const code = (err as { code?: string }).code;
       if (code === "auth/email-already-in-use") {
         setError("Ya existe una cuenta con ese email.");
@@ -44,8 +34,14 @@ export function Register() {
         setError("La contraseña es muy débil.");
       } else if (code === "auth/invalid-email") {
         setError("El email no es válido.");
+      } else if (code === "auth/operation-not-allowed") {
+        setError("El registro con email y contraseña no está habilitado. Activalo en la consola de Firebase > Authentication > Métodos de inicio de sesión.");
+      } else if (code === "auth/invalid-api-key") {
+        setError("La API key de Firebase no es válida. Revisá la configuración en .env");
+      } else if (code === "auth/network-request-failed") {
+        setError("Error de conexión. Verificá tu conexión a internet.");
       } else {
-        setError("Ocurrió un error al crear la cuenta.");
+        setError(`Ocurrió un error al crear la cuenta. (${code ?? "desconocido"})`);
       }
     } finally {
       setIsSubmitting(false);

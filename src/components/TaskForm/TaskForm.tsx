@@ -1,10 +1,11 @@
-import { useEffect, useState, type SubmitEvent } from "react";
+import { useEffect, useState } from "react"; //si uso React.SubmitEvent no hace falta importarlo?
 import {
   type Task,
   type TaskFormData,
 } from "../../types/task";
 import "./TaskForm.css";
 import { emptyTaskFormData } from "../../types/taskDefaults";
+import { validateTask } from "../../utils/validators/taskValidator";
 
 interface TaskFormProps {
   taskToEdit: Task | null; // null = modo "crear"
@@ -43,15 +44,13 @@ export function TaskForm({ taskToEdit, onSubmit, onCancelEdit }: TaskFormProps) 
     setFormData((prev) => ({ ...prev, [field]: value }));
   }
 
-  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     setFormError(null);
 
-    if (!formData.title.trim()) {
-      setFormError("El título es obligatorio.");
-      return;
-    }
-
+    const error = validateTask(formData);
+    if (error) { setFormError(error); return; }
+    
     setIsSubmitting(true);
     try {
       await onSubmit(formData);

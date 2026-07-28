@@ -1,5 +1,5 @@
 import { FilteredTaskList } from "../../components/FilteredTaskList/FilteredTaskList";
-import "./Tasks.css";
+//import "./Tasks.css";
 
 export function Tasks() {
   return (
