@@ -4,6 +4,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../services/firebase";
 import "./Register.css";
 import { validateRegister } from "../../utils/validators/registerValidator";
+import { getFirebaseErrorMessage } from "../../utils/authErrors";
 
 export function Register() {
   const [email, setEmail] = useState("");
@@ -28,21 +29,11 @@ export function Register() {
     } catch (err) {
       console.error("Error al crear cuenta:", err);
       const code = (err as { code?: string }).code;
-      if (code === "auth/email-already-in-use") {
-        setError("Ya existe una cuenta con ese email.");
-      } else if (code === "auth/weak-password") {
-        setError("La contraseña es muy débil.");
-      } else if (code === "auth/invalid-email") {
-        setError("El email no es válido.");
-      } else if (code === "auth/operation-not-allowed") {
-        setError("El registro con email y contraseña no está habilitado. Activalo en la consola de Firebase > Authentication > Métodos de inicio de sesión.");
-      } else if (code === "auth/invalid-api-key") {
-        setError("La API key de Firebase no es válida. Revisá la configuración en .env");
-      } else if (code === "auth/network-request-failed") {
-        setError("Error de conexión. Verificá tu conexión a internet.");
-      } else {
-        setError(`Ocurrió un error al crear la cuenta. (${code ?? "desconocido"})`);
-      }
+      setError(
+        code
+          ? getFirebaseErrorMessage(code, "Ocurrió un error al crear la cuenta.")
+          : "Ocurrió un error desconocido."
+      );
     } finally {
       setIsSubmitting(false);
     }

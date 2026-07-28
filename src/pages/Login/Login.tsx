@@ -4,6 +4,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../services/firebase";
 import "./Login.css";
 import { validateLogin } from "../../utils/validators/loginValidator";
+import { getFirebaseErrorMessage } from "../../utils/authErrors";
 
 export function Login() {
   const [email, setEmail] = useState("");
@@ -29,11 +30,11 @@ export function Login() {
       navigate(redirectTo, { replace: true });
     } catch (err) {
       const code = (err as { code?: string }).code;
-      if (code === "auth/invalid-credential" || code === "auth/user-not-found" || code === "auth/wrong-password") {
-        setError("Email o contraseña incorrectos.");
-      } else {
-        setError("Ocurrió un error al iniciar sesión.");
-      }
+      setError(
+        code
+          ? getFirebaseErrorMessage(code, "Ocurrió un error al iniciar sesión.")
+          : "Ocurrió un error desconocido."
+      );
     } finally {
       setIsSubmitting(false);
     }
