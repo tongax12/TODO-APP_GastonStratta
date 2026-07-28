@@ -24,6 +24,7 @@ export function useTasks(): UseTasksResult {
     try {
       const data = await taskService.subscribeToTasks(user.uid);
       setTasks(data);
+      setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al cargar tareas.");
     } finally {

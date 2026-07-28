@@ -16,7 +16,6 @@ const PRIORITY_LABEL: Record<Task["priority"], string> = {
 
 const STATUS_LABEL: Record<TaskStatus, string> = {
   pending: "Pendiente",
-  "in-progress": "En curso",
   completed: "Completada",
 };
 

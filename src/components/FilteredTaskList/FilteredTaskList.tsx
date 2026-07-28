@@ -5,19 +5,36 @@ import { TaskList } from "../TaskList/TaskList";
 import {
   type Task,
   type TaskFilters,
+  type TaskFormData,
   type TaskStatus,
 } from "../../types/task";
 import "./FilteredTaskList.css";
-import { useTasks } from "../../hooks/useTask";
 import { defaultTaskFilters } from "../../types/taskDefaults";
 
+interface FilteredTaskListProps {
+  tasks: Task[];
+  isLoading: boolean;
+  error: string | null;
+  createTask: (data: TaskFormData) => Promise<void>;
+  updateTask: (id: string, data: Partial<TaskFormData>) => Promise<void>;
+  deleteTask: (id: string) => Promise<void>;
+}
+
 /**
- * Componente "inteligente": conecta los datos (useTasks) con la UI
- * (TaskForm + TaskList), y es dueño del estado de filtros y de qué tarea
- * se está editando.
+ * Componente "inteligente" para filtros y edición, pero ya NO dueño de los
+ * datos: tasks/createTask/updateTask/deleteTask llegan por props desde
+ * Tasks.tsx, que es quien llama a useTasks() una sola vez. Así este
+ * componente y EmailSummaryButton comparten el mismo estado en vez de tener
+ * cada uno su propia copia desincronizada.
  */
-export function FilteredTaskList() {
-  const { tasks, isLoading, error, createTask, updateTask, deleteTask } = useTasks();
+export function FilteredTaskList({
+  tasks,
+  isLoading,
+  error,
+  createTask,
+  updateTask,
+  deleteTask,
+}: FilteredTaskListProps) {
   const [filters, setFilters] = useState<TaskFilters>(defaultTaskFilters);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
@@ -46,7 +63,7 @@ export function FilteredTaskList() {
     await updateTask(id, { status: nextStatus });
   }
 
-  async function handleFormSubmit(data: Parameters<typeof createTask>[0]) {
+  async function handleFormSubmit(data: TaskFormData) {
     if (editingTask) {
       await updateTask(editingTask.id, data);
       setEditingTask(null);

@@ -2,7 +2,7 @@ import { Timestamp } from "firebase/firestore";
 
 export type TaskPriority = "low" | "medium" | "high";
 
-export type TaskStatus = "pending" | "in-progress" | "completed";
+export type TaskStatus = "pending" | "completed";
 
 
 export interface Task {
