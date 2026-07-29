@@ -1,10 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { auth, googleProvider } from "../../services/firebase";
+import {
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
+import { auth } from "../../services/firebase";
 import "./Login.css";
 import { validateLogin } from "../../utils/validators/loginValidator";
 import { getFirebaseErrorMessage } from "../../utils/authErrors";
+
 
 export function Login() {
   const [email, setEmail] = useState("");
@@ -16,18 +22,29 @@ export function Login() {
   const location = useLocation();
   const redirectTo = (location.state as { from?: string })?.from ?? "/tasks";
 
+  // Redirige automáticamente cuando Firebase confirma la sesión (incluso tras volver del redirect de Google)
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        navigate(redirectTo, { replace: true });
+      }
+    });
+    return () => unsubscribe();
+  }, [navigate, redirectTo]);
+
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
 
-    const error = validateLogin({ email, password });
-    if (error) { setError(error); return; }
-
+    const validationError = validateLogin({ email, password });
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
 
     setIsSubmitting(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate(redirectTo, { replace: true });
     } catch (err) {
       const code = (err as { code?: string }).code;
       setError(
@@ -40,23 +57,33 @@ export function Login() {
     }
   }
 
-  async function handleGoogleSignIn() {
-    setError(null);
-    setIsSubmitting(true);
-    try {
-      await signInWithPopup(auth, googleProvider);
-      navigate(redirectTo, { replace: true });
-    } catch (err) {
-      const code = (err as { code?: string }).code;
-      // El usuario cerrando el popup no es un "error" real, no hace falta mostrar nada.
-      if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
-        return;
-      }
-      setError(getFirebaseErrorMessage(code ?? "", "No se pudo continuar con Google."));
-    } finally {
-      setIsSubmitting(false);
+async function handleGoogleSignIn() {
+  setError(null);
+  setIsSubmitting(true);
+
+  // Creamos el proveedor e indicamos que SIEMPRE pida seleccionar cuenta
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({
+    prompt: "select_account",
+  });
+
+  try {
+    await signInWithPopup(auth, provider);
+  } catch (err) {
+    const code = (err as { code?: string }).code;
+
+    if (
+      code === "auth/popup-closed-by-user" ||
+      code === "auth/cancelled-popup-request"
+    ) {
+      return;
     }
+
+    setError(getFirebaseErrorMessage(code ?? "", "No se pudo continuar con Google."));
+  } finally {
+    setIsSubmitting(false);
   }
+}
 
   return (
     <div className="login">
@@ -111,8 +138,7 @@ export function Login() {
       </button>
 
       <p className="login__link">
-        ¿No tenés cuenta?{" "}
-        <Link to="/register">Crear una</Link>
+        ¿No tenés cuenta? <Link to="/register">Crear una</Link>
       </p>
     </div>
   );
