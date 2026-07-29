@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import type { Task } from "../../types/task"
 import "./EmailSummaryButton.css"
 
@@ -24,6 +24,16 @@ function buildTodoSummary(todos: Task[]): string {
 function EmailSummaryButton({ todos, userEmail }: Props) {
     const [status, setStatus] = useState<Status>("idle")
     const [errorMsg, setErrorMsg] = useState("")
+
+    // Auto-hide success message after 3 seconds
+    useEffect(() => {
+        if (status === "success" || status === "error") {
+            const timer = setTimeout(() => {
+                setStatus("idle")
+            }, 3000)
+            return () => clearTimeout(timer)
+        }
+    }, [status])
 
     async function handleSend() {
         setStatus("loading")
@@ -62,7 +72,6 @@ function EmailSummaryButton({ todos, userEmail }: Props) {
                 onClick={handleSend}
                 disabled={status === "loading" || todos.length === 0}
             >
-                {/* Mail icon */}
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
@@ -80,7 +89,6 @@ function EmailSummaryButton({ todos, userEmail }: Props) {
 
                 {status === "loading" ? "Enviando..." : "Enviar resumen por email"}
 
-                {/* Badge with pending task count */}
                 {pendingCount > 0 && (
                     <span className="email-btn__badge">{pendingCount}</span>
                 )}
