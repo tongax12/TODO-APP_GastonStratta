@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Task, TaskStatus } from "../../types/task";
 import "./TaskItem.css";
 
@@ -19,18 +20,34 @@ const STATUS_LABEL: Record<TaskStatus, string> = {
   completed: "Completada",
 };
 
+function isOverdue(dueDate: string | null | undefined): boolean {
+  if (!dueDate) return false;  // null, undefined o string vacío
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const due = new Date(dueDate);
+  return due < today;
+}
+
 export function TaskItem({ task, onToggleStatus, onEdit, onDelete }: TaskItemProps) {
+  const [isDeleting, setIsDeleting] = useState(false);
   const isCompleted = task.status === "completed";
+  const overdue = isOverdue(task.dueDate);
 
   function handleCheckboxChange() {
     onToggleStatus(task.id, isCompleted ? "pending" : "completed");
   }
 
+  function handleDelete() {
+    setIsDeleting(true);
+    // Wait for animation to finish before actually removing
+    setTimeout(() => {
+      onDelete(task.id);
+    }, 300);
+  }
+
   return (
-    <li className={`task-item task-item--${task.priority}`}>
+    <li className={`task-item task-item--${task.priority} ${isDeleting ? "task-item--deleting" : ""}`}>
       <div className="task-item__body">
-        {/* Checkbox y título ahora van juntos en la misma fila, en cualquier
-            tamaño de pantalla, en vez de que el checkbox quede arriba suelto. */}
         <div className="task-item__header">
           <label className="task-item__checkbox">
             <input
@@ -51,7 +68,11 @@ export function TaskItem({ task, onToggleStatus, onEdit, onDelete }: TaskItemPro
         <div className="task-item__meta">
           <span className="task-item__badge">{PRIORITY_LABEL[task.priority]}</span>
           <span className="task-item__badge">{STATUS_LABEL[task.status]}</span>
-          {task.dueDate && <span className="task-item__due">Vence: {task.dueDate}</span>}
+          {task.dueDate && (
+            <span className={`task-item__due ${overdue ? "task-item__due--overdue" : ""}`}>
+              Vence: {task.dueDate}
+            </span>
+          )}
         </div>
       </div>
 
@@ -61,7 +82,7 @@ export function TaskItem({ task, onToggleStatus, onEdit, onDelete }: TaskItemPro
         </button>
         <button
           className="task-item__delete"
-          onClick={() => onDelete(task.id)}
+          onClick={handleDelete}
           aria-label={`Eliminar "${task.title}"`}
         >
           Eliminar

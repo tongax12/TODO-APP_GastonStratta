@@ -1,4 +1,8 @@
-/* Base: mobile-first, pensado desde 320px hacia arriba */
+/* ============================================================
+   EMAIL SUMMARY BUTTON — Teal & Coral palette
+   ============================================================ */
+
+/* Container */
 .email-summary {
   display: flex;
   flex-direction: column;
@@ -6,41 +10,170 @@
   gap: 0.5rem;
 }
 
-.email-summary button {
-  padding: 0.65rem 1rem;
-  border: none;
-  border-radius: 9px;
-  background: var(--color-primary);
-  color: var(--color-surface);
+/* Main button */
+.email-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.1rem;
+  border: 1.5px solid #0d9488;
+  border-radius: 10px;
+  background: white;
+  color: #0d9488;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   cursor: pointer;
-  transition: background-color 0.15s ease, transform 0.05s ease;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-.email-summary button:hover:not(:disabled) {
-  background: var(--color-primary-hover);
+/* Shimmer effect */
+.email-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s ease;
 }
 
-.email-summary button:active:not(:disabled) {
-  transform: scale(0.99);
+.email-btn:hover::before {
+  left: 100%;
 }
 
-.email-summary button:disabled {
+.email-btn:hover:not(:disabled) {
+  background: #0d9488;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(13, 148, 136, 0.3);
+}
+
+.email-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.97);
+}
+
+.email-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.email-summary__status--success {
-  font-size: 0.82rem;
-  color: var(--color-success);
-  font-weight: 600;
+/* Loading state */
+.email-btn--loading {
+  background: #0d9488;
+  color: white;
 }
 
-.email-summary__status--error {
+.email-btn--loading::after {
+  content: '';
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spinner 0.6s linear infinite;
+  margin-left: 0.3rem;
+}
+
+/* Task count badge */
+.email-btn__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 0.35rem;
+  background: #0d9488;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+}
+
+.email-btn:hover:not(:disabled) .email-btn__badge {
+  background: white;
+  color: #0d9488;
+  transform: scale(1.1);
+}
+
+/* Status messages */
+.email-status {
+  margin: 0;
   font-size: 0.82rem;
-  color: var(--color-danger);
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  animation: statusFadeIn 0.3s ease;
+}
+
+.email-status--success {
+  color: #10b981;
+}
+
+.email-status--success::before {
+  content: '✓';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: #10b981;
+  color: white;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  animation: checkPop 0.4s ease;
+}
+
+.email-status--error {
+  color: #ef4444;
+  animation: statusFadeIn 0.3s ease, shakeError 0.4s ease;
+}
+
+.email-status--error::before {
+  content: '!';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: #ef4444;
+  color: white;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+/* Animations */
+@keyframes spinner {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes statusFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes checkPop {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+@keyframes shakeError {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
 }
 
 /* ---------- Tablet: 720px en adelante ---------- */
@@ -51,14 +184,26 @@
     gap: 0.75rem;
   }
 
-  .email-summary button {
+  .email-btn {
     padding: 0.7rem 1.2rem;
   }
 }
 
 /* ---------- Desktop: 1080px en adelante ---------- */
 @media (min-width: 1080px) {
-  .email-summary button:hover:not(:disabled) {
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  .email-btn:hover:not(:disabled) {
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15), 0 6px 20px rgba(13, 148, 136, 0.3);
+  }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .email-btn,
+  .email-btn::before,
+  .email-btn__badge,
+  .email-status {
+    transition: none;
+    animation: none;
+    transform: none;
   }
 }

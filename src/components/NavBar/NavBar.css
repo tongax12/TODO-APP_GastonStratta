@@ -1,7 +1,17 @@
-/* Base: mobile-first, pensado desde 320px hacia arriba */
+/* ============================================================
+   NAVBAR — Defensive CSS, forces button styles
+   ============================================================ */
+
 .navbar {
-  background: var(--color-navbar-bg);
-  color: var(--color-navbar-text);
+  background: var(--color-navbar-bg, #0f172a);
+  color: var(--color-navbar-text, #f8fafc);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  flex-shrink: 0;
 }
 
 .navbar__bar {
@@ -11,69 +21,187 @@
   padding: 0.75rem 1rem;
 }
 
+.navbar__left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .navbar__brand {
-  color: var(--color-navbar-text);
+  color: var(--color-navbar-text, #f8fafc);
   font-weight: 700;
   font-size: 1.05rem;
   letter-spacing: -0.02em;
   text-decoration: none;
 }
 
+/* ============================================================
+   AUTH BUTTONS — Force display and styles
+   ============================================================ */
+
+/* Container: hidden on mobile, flex on desktop */
+.navbar__auth {
+  display: none;
+}
+
+/* ALL auth buttons (a or button) */
+.navbar__auth > a,
+.navbar__auth > button,
+.navbar__menu > a.navbar__auth-btn,
+.navbar__menu > button.navbar__auth-btn,
+a.navbar__auth-btn,
+button.navbar__auth-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0.55rem 0.9rem !important;
+  border-radius: 8px !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  font-family: inherit !important;
+  line-height: 1.4 !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  border: none !important;
+  outline: none !important;
+  box-sizing: border-box !important;
+  height: auto !important;
+  min-height: 36px !important;
+}
+
+/* Secondary: Ingresar / Mis tareas */
+.navbar__auth > a:not(.navbar__auth-btn--primary),
+.navbar__menu > a.navbar__auth-btn:not(.navbar__auth-btn--primary),
+a.navbar__auth-btn:not(.navbar__auth-btn--primary) {
+  background: transparent !important;
+  color: #94a3b8 !important;
+  border: 1.5px solid rgba(148, 163, 184, 0.3) !important;
+}
+
+.navbar__auth > a:not(.navbar__auth-btn--primary):hover,
+a.navbar__auth-btn:not(.navbar__auth-btn--primary):hover {
+  color: #f8fafc !important;
+  border-color: rgba(148, 163, 184, 0.5) !important;
+  background: rgba(148, 163, 184, 0.1) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Primary: Crear cuenta — EXACT same as logout */
+.navbar__auth > a.navbar__auth-btn--primary,
+.navbar__menu > a.navbar__auth-btn--primary,
+a.navbar__auth-btn--primary {
+  background: var(--color-primary, #0d9488) !important;
+  color: white !important;
+  border: none !important;
+}
+
+.navbar__auth > a.navbar__auth-btn--primary:hover,
+a.navbar__auth-btn--primary:hover {
+  background: var(--color-primary-hover, #0f766e) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3) !important;
+}
+
+/* ============================================================
+   RIGHT SIDE — Auth + User + Logout + Toggle, todo agrupado
+   ============================================================ */
+
+.navbar__right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.navbar__user {
+  display: none;
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+/* Logout button */
+button.navbar__logout {
+  display: none;
+  background: var(--color-primary, #0d9488);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  line-height: 1.4;
+}
+
+button.navbar__logout:hover {
+  background: var(--color-primary-hover, #0f766e);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+}
+
+/* Toggle */
 .navbar__toggle {
+  display: flex;
   background: none;
   border: none;
-  color: var(--color-navbar-text);
+  color: var(--color-navbar-text, #f8fafc);
   font-size: 1.4rem;
   line-height: 1;
   cursor: pointer;
   padding: 0.25rem;
 }
 
+/* ============================================================
+   MOBILE MENU
+   ============================================================ */
+
 .navbar__menu {
-  display: none;
-  flex-direction: column;
-  gap: 0.85rem;
-  padding: 0 1rem 1rem;
-}
-
-.navbar__menu--open {
   display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem 1rem;
+  background: var(--color-navbar-bg, #0f172a);
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  animation: menuSlideDown 0.25s ease;
 }
 
-.navbar__menu a {
-  color: var(--color-navbar-text-muted);
+@keyframes menuSlideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Non-button links in mobile menu */
+.navbar__menu > a:not(.navbar__auth-btn) {
+  color: #94a3b8;
   font-size: 0.9rem;
   text-decoration: none;
-  transition: color 0.15s ease;
+  padding: 0.5rem 0;
+  transition: all 0.2s ease;
+  display: inline-flex;
 }
 
-.navbar__menu a:hover {
-  color: var(--color-navbar-text);
+.navbar__menu > a:not(.navbar__auth-btn):hover {
+  color: #f8fafc;
+  transform: translateX(4px);
 }
 
-.navbar__user {
-  color: var(--color-navbar-text-subtle);
+.navbar__user--mobile {
+  color: #64748b;
   font-size: 0.8rem;
+  padding: 0.25rem 0.9rem;
 }
 
-.navbar__logout {
-  background: var(--color-primary);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 0.55rem 0.85rem;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
+button.navbar__logout--mobile {
+  display: inline-flex;
   width: fit-content;
-  transition: background-color 0.15s ease;
 }
 
-.navbar__logout:hover {
-  background: var(--color-primary-hover);
-}
+/* ============================================================
+   TABLET+ — Show auth buttons, hide mobile menu
+   ============================================================ */
 
-/* ---------- Tablet: 720px en adelante ---------- */
 @media (min-width: 720px) {
   .navbar__bar {
     padding: 0.85rem 1.5rem;
@@ -83,32 +211,42 @@
     font-size: 1.15rem;
   }
 
+  .navbar__auth {
+    display: flex !important;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
   .navbar__toggle {
     display: none;
   }
 
   .navbar__menu {
-    display: flex !important;
-    flex-direction: row;
-    align-items: center;
-    gap: 1.25rem;
-    padding: 0 1.5rem;
+    display: none !important;
   }
 
   .navbar__user {
-    margin-left: auto;
+    display: inline;
+  }
+
+  button.navbar__logout {
+    display: inline-flex;
   }
 }
 
-/* ---------- Desktop: 1080px en adelante ---------- */
 @media (min-width: 1080px) {
-  .navbar__bar,
-  .navbar__menu {
+  .navbar__bar {
     padding-left: 2rem;
     padding-right: 2rem;
   }
 
-  .navbar__menu {
-    gap: 1.5rem;
+  .navbar__auth {
+    gap: 0.75rem;
+  }
+
+  .navbar__auth > a,
+  a.navbar__auth-btn {
+    padding: 0.6rem 1rem !important;
+    font-size: 0.88rem !important;
   }
 }

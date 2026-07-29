@@ -1,8 +1,15 @@
-/* Base: mobile-first, pensado desde 320px hacia arriba */
+/* ============================================================
+   TASKS PAGE — Enhanced with subtle background texture
+   ============================================================ */
+
 .tasks-page {
   min-height: 100vh;
   background: var(--color-bg);
   padding: 1rem 0.75rem 2rem;
+  /* Subtle dot pattern for visual depth */
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(99, 102, 241, 0.04) 1px, transparent 0);
+  background-size: 24px 24px;
 }
 
 /* ---------- Tablet: 720px en adelante ---------- */

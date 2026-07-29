@@ -1,4 +1,7 @@
-/* Base: mobile-first, pensado desde 320px hacia arriba */
+/* ============================================================
+   TASK FORM — Enhanced with focus glow, shimmer button, animations
+   ============================================================ */
+
 .task-form {
   display: flex;
   flex-direction: column;
@@ -7,7 +10,16 @@
   border: 1px solid var(--color-border-soft);
   border-radius: 12px;
   padding: 1.1rem;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 4px 16px -4px rgba(15, 23, 42, 0.06);
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.task-form:hover {
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 8px 24px -6px rgba(15, 23, 42, 0.1);
 }
 
 .task-form__heading {
@@ -16,6 +28,20 @@
   font-weight: 700;
   color: var(--color-text);
   letter-spacing: -0.01em;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+/* Subtle accent line under heading */
+.task-form__heading::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: var(--color-primary);
+  border-radius: 3px;
 }
 
 .task-form__field {
@@ -28,6 +54,12 @@
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--color-text-secondary);
+  transition: color 0.2s ease;
+}
+
+/* Label color change when input is focused */
+.task-form__field:focus-within label {
+  color: var(--color-primary);
 }
 
 .task-form__field input,
@@ -37,10 +69,10 @@
   border: 1.5px solid var(--color-border);
   border-radius: 9px;
   font: inherit;
-  font-size: 16px; /* evita el zoom automático de iOS al enfocar */
+  font-size: 16px;
   color: var(--color-text);
   background: var(--color-surface-muted);
-  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
 }
 
 .task-form__field textarea {
@@ -51,12 +83,14 @@
 .task-form__field input::placeholder,
 .task-form__field textarea::placeholder {
   color: var(--color-text-subtle);
+  transition: color 0.2s ease;
 }
 
 .task-form__field input:hover,
 .task-form__field textarea:hover,
 .task-form__field select:hover {
   border-color: var(--color-border-hover);
+  transform: translateY(-1px);
 }
 
 .task-form__field input:focus,
@@ -65,7 +99,14 @@
   outline: none;
   border-color: var(--color-primary-focus);
   background: white;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12), 0 2px 8px rgba(99, 102, 241, 0.08);
+  transform: translateY(-1px);
+}
+
+.task-form__field input:focus::placeholder,
+.task-form__field textarea:focus::placeholder {
+  color: var(--color-text-subtle);
+  opacity: 0.6;
 }
 
 .task-form__row {
@@ -82,6 +123,15 @@
   background: var(--color-danger-bg);
   border: 1px solid var(--color-danger-border);
   border-radius: 8px;
+  animation: shakeError 0.4s ease;
+}
+
+@keyframes shakeError {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
 }
 
 .task-form__actions {
@@ -97,20 +147,48 @@
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: background-color 0.15s ease, transform 0.05s ease;
+  transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
 }
 
+/* Submit button with shimmer effect */
 .task-form__actions button[type="submit"] {
   background: var(--color-primary);
   color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.task-form__actions button[type="submit"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.task-form__actions button[type="submit"]:hover:not(:disabled)::before {
+  left: 100%;
 }
 
 .task-form__actions button[type="submit"]:hover:not(:disabled) {
   background: var(--color-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
 }
 
 .task-form__actions button[type="submit"]:active:not(:disabled) {
-  transform: scale(0.99);
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
 }
 
 .task-form__actions button[type="submit"]:disabled {
@@ -121,10 +199,17 @@
 .task-form__cancel {
   background: var(--color-surface-alt) !important;
   color: var(--color-text-secondary) !important;
+  transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease !important;
 }
 
 .task-form__cancel:hover {
   background: var(--color-border) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.task-form__cancel:active {
+  transform: translateY(0) scale(0.98);
 }
 
 /* ---------- Tablet: 720px en adelante ---------- */
@@ -151,12 +236,32 @@
 @media (min-width: 1080px) {
   .task-form {
     padding: 1.6rem;
-    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04);
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.04),
+      0 8px 24px -6px rgba(15, 23, 42, 0.08);
   }
 
-  .task-form__field input:hover,
-  .task-form__field textarea:hover,
-  .task-form__field select:hover {
-    border-color: var(--color-border-hover);
+  .task-form:hover {
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.04),
+      0 12px 32px -8px rgba(15, 23, 42, 0.12);
+  }
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .task-form,
+  .task-form__field input,
+  .task-form__field textarea,
+  .task-form__field select,
+  .task-form__actions button,
+  .task-form__error {
+    transition: none;
+    animation: none;
+    transform: none;
+  }
+
+  .task-form__actions button[type="submit"]::before {
+    display: none;
   }
 }

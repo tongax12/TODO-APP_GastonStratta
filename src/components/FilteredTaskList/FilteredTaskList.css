@@ -1,4 +1,7 @@
-/* Base: mobile-first, pensado desde 320px hacia arriba */
+/* ============================================================
+   FILTERED TASK LIST — Enhanced search, animated filters
+   ============================================================ */
+
 .filtered-task-list {
   display: flex;
   flex-direction: column;
@@ -15,7 +18,16 @@
   border: 1px solid var(--color-border-soft);
   border-radius: 12px;
   padding: 0.85rem;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 4px 16px -4px rgba(15, 23, 42, 0.04);
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.filtered-task-list__filters:hover {
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 8px 24px -6px rgba(15, 23, 42, 0.08);
 }
 
 .filtered-task-list__filters input,
@@ -24,27 +36,43 @@
   border: 1.5px solid var(--color-border);
   border-radius: 9px;
   font: inherit;
-  font-size: 16px; /* evita el zoom automático de iOS al enfocar */
+  font-size: 16px;
   color: var(--color-text);
   background: var(--color-surface-muted);
-  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.filtered-task-list__filters input {
+  /* Space for search icon if you add one via pseudo-element */
+  padding-left: 2.2rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 0.75rem center;
+  background-size: 16px;
 }
 
 .filtered-task-list__filters input::placeholder {
   color: var(--color-text-subtle);
+  transition: color 0.2s ease;
 }
 
 .filtered-task-list__filters input:hover,
 .filtered-task-list__filters select:hover {
   border-color: var(--color-border-hover);
+  transform: translateY(-1px);
 }
 
 .filtered-task-list__filters input:focus,
 .filtered-task-list__filters select:focus {
   outline: none;
   border-color: var(--color-primary-focus);
-  background: white;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  background-color: white;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12), 0 2px 8px rgba(99, 102, 241, 0.08);
+  transform: translateY(-1px);
+}
+
+.filtered-task-list__filters input:focus::placeholder {
+  opacity: 0.5;
 }
 
 .filtered-task-list__error {
@@ -55,6 +83,15 @@
   background: var(--color-danger-bg);
   border: 1px solid var(--color-danger-border);
   border-radius: 8px;
+  animation: shakeError 0.4s ease;
+}
+
+@keyframes shakeError {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
 }
 
 /* ---------- Tablet: 720px en adelante ---------- */
@@ -86,6 +123,26 @@
 
   .filtered-task-list__filters {
     padding: 1rem 1.1rem;
-    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04);
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.04),
+      0 8px 24px -6px rgba(15, 23, 42, 0.06);
+  }
+
+  .filtered-task-list__filters:hover {
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.04),
+      0 12px 32px -8px rgba(15, 23, 42, 0.1);
+  }
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .filtered-task-list__filters,
+  .filtered-task-list__filters input,
+  .filtered-task-list__filters select,
+  .filtered-task-list__error {
+    transition: none;
+    animation: none;
+    transform: none;
   }
 }

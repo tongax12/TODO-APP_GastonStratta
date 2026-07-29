@@ -1,63 +1,97 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../../services/firebase";
-import "./Navbar.css";
+import "./NavBar.css";
 import { useAuth } from "../../features/auth/Authenticator";
 
 export function Navbar() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // toggle mobile-first
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    }
+    if (isMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isMenuOpen]);
 
   async function handleLogout() {
     await signOut(auth);
+    setIsMenuOpen(false);
     navigate("/login");
   }
 
   return (
     <nav className="navbar">
       <div className="navbar__bar">
-        <Link to="/" className="navbar__brand">
-          Tareas
-        </Link>
+        {/* LEFT: solo la marca */}
+        <div className="navbar__left">
+          <Link to="/" className="navbar__brand">
+            MateCode
+          </Link>
+        </div>
 
-        <button
-          className="navbar__toggle"
-          onClick={() => setIsMenuOpen((prev) => !prev)}
-          aria-expanded={isMenuOpen}
-          aria-controls="navbar-menu"
-          aria-label="Abrir menú"
-        >
-          <span aria-hidden="true">☰</span>
-        </button>
+        {/* RIGHT: auth buttons + user + logout + toggle, todo agrupado a la derecha */}
+        <div className="navbar__right">
+          {!user && (
+            <div className="navbar__auth">
+              <Link to="/login" className="navbar__auth-btn">
+                Ingresar
+              </Link>
+              <Link to="/register" className="navbar__auth-btn navbar__auth-btn--primary">
+                Crear cuenta
+              </Link>
+            </div>
+          )}
+
+          {user && (
+            <>
+              <span className="navbar__user">{user.email}</span>
+              <button className="navbar__logout" onClick={handleLogout}>
+                Cerrar sesión
+              </button>
+            </>
+          )}
+          <button
+            className="navbar__toggle"
+            onClick={() => setIsMenuOpen((prev) => !prev)}
+            aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
+          >
+            {isMenuOpen ? "✕" : "☰"}
+          </button>
+        </div>
       </div>
 
-      <div
-        id="navbar-menu"
-        className={`navbar__menu ${isMenuOpen ? "navbar__menu--open" : ""}`}
-      >
-        {user ? (
-          <>
-            <Link to="/tasks" onClick={() => setIsMenuOpen(false)}>
-              Mis tareas
-            </Link>
-            <span className="navbar__user">{user.email}</span>
-            <button className="navbar__logout" onClick={handleLogout}>
-              Cerrar sesión
-            </button>
-          </>
-        ) : (
-          <>
-            <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-              Ingresar
-            </Link>
-            <Link to="/register" onClick={() => setIsMenuOpen(false)}>
-              Crear cuenta
-            </Link>
-          </>
-        )}
-      </div>
+      {/* Mobile menu */}
+      {isMenuOpen && (
+        <div ref={menuRef} className="navbar__menu">
+          {user ? (
+            <>
+              <span className="navbar__user--mobile">{user.email}</span>
+              <button className="navbar__logout navbar__logout--mobile" onClick={handleLogout}>
+                Cerrar sesión
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="navbar__auth-btn" onClick={() => setIsMenuOpen(false)}>
+                Ingresar
+              </Link>
+              <Link to="/register" className="navbar__auth-btn navbar__auth-btn--primary" onClick={() => setIsMenuOpen(false)}>
+                Crear cuenta
+              </Link>
+            </>
+          )}
+        </div>
+      )}
     </nav>
   );
 }
