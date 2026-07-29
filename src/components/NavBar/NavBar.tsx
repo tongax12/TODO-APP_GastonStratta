@@ -4,6 +4,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../../services/firebase";
 import "./NavBar.css";
 import { useAuth } from "../../features/auth/Authenticator";
+import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
 
 export function Navbar() {
   const { user } = useAuth();
@@ -39,7 +40,7 @@ export function Navbar() {
           </Link>
         </div>
 
-        {/* RIGHT: auth buttons + user + logout + toggle, todo agrupado a la derecha */}
+        {/* RIGHT: auth buttons + user + logout + theme toggle + menú, todo agrupado a la derecha */}
         <div className="navbar__right">
           {!user && (
             <div className="navbar__auth">
@@ -60,6 +61,9 @@ export function Navbar() {
               </button>
             </>
           )}
+
+          <ThemeToggle />
+
           <button
             className="navbar__toggle"
             onClick={() => setIsMenuOpen((prev) => !prev)}

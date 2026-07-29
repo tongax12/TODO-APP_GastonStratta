@@ -16,10 +16,10 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.65rem 1.1rem;
-  border: 1.5px solid #0d9488;
+  border: 1.5px solid var(--color-primary);
   border-radius: 10px;
-  background: white;
-  color: #0d9488;
+  background: var(--color-surface);
+  color: var(--color-primary);
   font-weight: 600;
   font-size: 0.88rem;
   cursor: pointer;
@@ -50,7 +50,7 @@
 }
 
 .email-btn:hover:not(:disabled) {
-  background: #0d9488;
+  background: var(--color-primary);
   color: white;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(13, 148, 136, 0.3);
@@ -67,7 +67,7 @@
 
 /* Loading state */
 .email-btn--loading {
-  background: #0d9488;
+  background: var(--color-primary);
   color: white;
 }
 
@@ -90,7 +90,7 @@
   min-width: 1.4rem;
   height: 1.4rem;
   padding: 0 0.35rem;
-  background: #0d9488;
+  background: var(--color-primary);
   color: white;
   font-size: 0.7rem;
   font-weight: 700;
@@ -99,8 +99,8 @@
 }
 
 .email-btn:hover:not(:disabled) .email-btn__badge {
-  background: white;
-  color: #0d9488;
+  background: var(--color-surface);
+  color: var(--color-primary);
   transform: scale(1.1);
 }
 
@@ -116,7 +116,7 @@
 }
 
 .email-status--success {
-  color: #10b981;
+  color: var(--color-success);
 }
 
 .email-status--success::before {
@@ -126,7 +126,7 @@
   justify-content: center;
   width: 18px;
   height: 18px;
-  background: #10b981;
+  background: var(--color-success);
   color: white;
   border-radius: 50%;
   font-size: 0.7rem;
@@ -134,7 +134,7 @@
 }
 
 .email-status--error {
-  color: #ef4444;
+  color: var(--color-danger);
   animation: statusFadeIn 0.3s ease, shakeError 0.4s ease;
 }
 
@@ -145,7 +145,7 @@
   justify-content: center;
   width: 18px;
   height: 18px;
-  background: #ef4444;
+  background: var(--color-danger);
   color: white;
   border-radius: 50%;
   font-size: 0.7rem;

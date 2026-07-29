@@ -38,6 +38,51 @@
   --color-navbar-text-subtle: #64748b;
 }
 
+/* ============================================================
+   DARK THEME — mismos nombres de variable, valores oscuros.
+   Se activa poniendo data-theme="dark" en <html> (lo hace ThemeProvider).
+   Como el resto de los CSS ya usa var(--color-...) en vez de hex fijo,
+   con esto solo alcanza para que toda la app cambie de tema.
+   ============================================================ */
+[data-theme="dark"] {
+  --color-primary: #14b8a6;
+  --color-primary-hover: #2dd4bf;
+  --color-primary-soft: rgba(20, 184, 166, 0.14);
+  --color-primary-focus: #2dd4bf;
+
+  --color-success: #34d399;
+  --color-success-bg: rgba(52, 211, 153, 0.14);
+  --color-warning: #fbbf24;
+  --color-danger: #f87171;
+  --color-danger-bg: rgba(248, 113, 113, 0.14);
+  --color-danger-border: rgba(248, 113, 113, 0.35);
+  --color-danger-bg-strong: rgba(248, 113, 113, 0.22);
+  --color-danger-border-strong: rgba(248, 113, 113, 0.5);
+
+  --color-priority-high: #fb923c;
+
+  --color-bg: #0b1220;
+  --color-surface: #111827;
+  --color-surface-muted: #1e293b;
+  --color-surface-alt: #1e293b;
+
+  --color-text: #f1f5f9;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted: #94a3b8;
+  --color-text-subtle: #64748b;
+
+  --color-border: #334155;
+  --color-border-soft: #1e293b;
+  --color-border-hover: #475569;
+
+  --color-navbar-bg: #0b1220;
+  --color-navbar-text: #f8fafc;
+  --color-navbar-text-muted: #94a3b8;
+  --color-navbar-text-subtle: #64748b;
+
+  color-scheme: dark;
+}
+
 html {
   box-sizing: border-box;
   -webkit-text-size-adjust: 100%;
@@ -45,6 +90,9 @@ html {
 
 body {
   min-height: 100vh;
+  background: var(--color-bg);
+  color: var(--color-text);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 #root {

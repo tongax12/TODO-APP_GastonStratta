@@ -54,7 +54,7 @@
 }
 
 .task-list__status--empty {
-  background: white;
+  background: var(--color-surface);
   border: 1.5px dashed var(--color-border-hover);
   border-radius: 12px;
   transition: border-color 0.3s ease, background-color 0.3s ease;

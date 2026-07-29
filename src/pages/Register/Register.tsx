@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../services/firebase";
+import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "../../services/firebase";
 import "./Register.css";
 import { validateRegister } from "../../utils/validators/registerValidator";
 import { getFirebaseErrorMessage } from "../../utils/authErrors";
@@ -15,7 +15,7 @@ export function Register() {
 
   const navigate = useNavigate();
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
 
@@ -34,6 +34,23 @@ export function Register() {
           ? getFirebaseErrorMessage(code, "Ocurrió un error al crear la cuenta.")
           : "Ocurrió un error desconocido."
       );
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleGoogleSignIn() {
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      await signInWithPopup(auth, googleProvider);
+      navigate("/tasks", { replace: true });
+    } catch (err) {
+      const code = (err as { code?: string }).code;
+      if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+        return;
+      }
+      setError(getFirebaseErrorMessage(code ?? "", "No se pudo continuar con Google."));
     } finally {
       setIsSubmitting(false);
     }
@@ -86,6 +103,22 @@ export function Register() {
           {isSubmitting ? "Creando cuenta…" : "Crear cuenta"}
         </button>
       </form>
+
+      <div className="register__divider">o continuá con</div>
+
+      <button
+        type="button"
+        className="register__google-btn"
+        onClick={handleGoogleSignIn}
+        disabled={isSubmitting}
+      >
+        <img
+          src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+          alt=""
+          aria-hidden="true"
+        />
+        Continuar con Google
+      </button>
 
       <p className="register__link">
         ¿Ya tenés cuenta?{" "}

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../services/firebase";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "../../services/firebase";
 import "./Login.css";
 import { validateLogin } from "../../utils/validators/loginValidator";
 import { getFirebaseErrorMessage } from "../../utils/authErrors";
@@ -35,6 +35,24 @@ export function Login() {
           ? getFirebaseErrorMessage(code, "Ocurrió un error al iniciar sesión.")
           : "Ocurrió un error desconocido."
       );
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleGoogleSignIn() {
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      await signInWithPopup(auth, googleProvider);
+      navigate(redirectTo, { replace: true });
+    } catch (err) {
+      const code = (err as { code?: string }).code;
+      // El usuario cerrando el popup no es un "error" real, no hace falta mostrar nada.
+      if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+        return;
+      }
+      setError(getFirebaseErrorMessage(code ?? "", "No se pudo continuar con Google."));
     } finally {
       setIsSubmitting(false);
     }
@@ -75,6 +93,22 @@ export function Login() {
           {isSubmitting ? "Ingresando…" : "Ingresar"}
         </button>
       </form>
+
+      <div className="login__divider">o continuá con</div>
+
+      <button
+        type="button"
+        className="login__google-btn"
+        onClick={handleGoogleSignIn}
+        disabled={isSubmitting}
+      >
+        <img
+          src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+          alt=""
+          aria-hidden="true"
+        />
+        Continuar con Google
+      </button>
 
       <p className="login__link">
         ¿No tenés cuenta?{" "}
