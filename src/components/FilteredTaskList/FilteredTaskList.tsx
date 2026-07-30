@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { TaskForm } from "../TaskForm/TaskForm";
 import { TaskList } from "../TaskList/TaskList";
@@ -36,20 +36,19 @@ export function FilteredTaskList({
   deleteTask,
 }: FilteredTaskListProps) {
   const [filters, setFilters] = useState<TaskFilters>(defaultTaskFilters);
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
-  // Si la tarea que se estaba editando desaparece de la lista (la borraron
-  // desde otra pestaña, por ejemplo), salimos del modo edición para no dejar
-  // el formulario mostrando datos de una tarea que ya no existe.
-  useEffect(() => {
-    if (editingTask && !tasks.some((task) => task.id === editingTask.id)) {
-      setEditingTask(null);
-    }
-  }, [tasks, editingTask]);
+  // Guardamos solo el ID, no el objeto Task completo. El objeto en sí se
+  // deriva buscándolo en `tasks` en cada render (línea de abajo): si la tarea
+  // se borra desde otra pestaña, `tasks` cambia, la búsqueda no encuentra
+  // nada, y `editingTask` pasa a ser null automáticamente en el próximo
+  // render — sin useEffect, sin setState en cascada.
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const editingTask = editingTaskId
+    ? tasks.find((task) => task.id === editingTaskId) ?? null
+    : null;
 
-  // El filtrado es un cálculo derivado de tasks + filters: se recalcula en
-  // cada render, no necesita su propio useState (evita tener dos fuentes de
-  // verdad desincronizadas).
+  // El filtrado también es un cálculo derivado de tasks + filters: se
+  // recalcula en cada render, no necesita su propio useState.
   const filteredTasks = tasks.filter((task) => {
     const matchesStatus = filters.status === "all" || task.status === filters.status;
     const matchesPriority = filters.priority === "all" || task.priority === filters.priority;
@@ -66,7 +65,7 @@ export function FilteredTaskList({
   async function handleFormSubmit(data: TaskFormData) {
     if (editingTask) {
       await updateTask(editingTask.id, data);
-      setEditingTask(null);
+      setEditingTaskId(null);
     } else {
       await createTask(data);
     }
@@ -75,9 +74,10 @@ export function FilteredTaskList({
   return (
     <section className="filtered-task-list">
       <TaskForm
+        key={editingTask?.id ?? "new"}
         taskToEdit={editingTask}
         onSubmit={handleFormSubmit}
-        onCancelEdit={() => setEditingTask(null)}
+        onCancelEdit={() => setEditingTaskId(null)}
       />
 
       <div className="filtered-task-list__filters">
@@ -96,7 +96,6 @@ export function FilteredTaskList({
         >
           <option value="all">Todos los estados</option>
           <option value="pending">Pendiente</option>
-          <option value="in-progress">En curso</option>
           <option value="completed">Completada</option>
         </select>
 
@@ -122,7 +121,7 @@ export function FilteredTaskList({
         tasks={filteredTasks}
         isLoading={isLoading}
         onToggleStatus={handleToggleStatus}
-        onEdit={setEditingTask}
+        onEdit={(task) => setEditingTaskId(task.id)}
         onDelete={deleteTask}
       />
     </section>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"; //si uso React.SubmitEvent no hace falta importarlo?
+import { useState, type FormEvent } from "react";
 import {
   type Task,
   type TaskFormData,
@@ -14,28 +14,32 @@ interface TaskFormProps {
 }
 
 /**
- * Un solo formulario sirve para crear y editar. La diferencia la marca la
- * prop `taskToEdit`: cuando cambia, useEffect resetea el estado local con
- * los datos de esa tarea (o los vacía si vuelve a ser null).
+ * Un solo formulario sirve para crear y editar, según `taskToEdit`.
+ *
+ * OJO con el patrón: ya NO usamos useEffect para "sincronizar" formData con
+ * taskToEdit cuando cambia. En cambio, el estado inicial se calcula UNA sola
+ * vez a partir de la prop (función lazy de useState), y quien nos renderiza
+ * (FilteredTaskList) nos pasa un `key={editingTask?.id ?? "new"}` — cuando
+ * esa key cambia (pasamos de editar la tarea A a la B, o de A a "crear
+ * nueva"), React directamente desmonta y vuelve a montar este componente
+ * desde cero, así que el estado se resetea solo, sin efectos ni setState en
+ * cascada. Es el patrón que la propia documentación de React recomienda
+ * para "resetear todo el estado cuando cambia una prop".
  */
 export function TaskForm({ taskToEdit, onSubmit, onCancelEdit }: TaskFormProps) {
-  const [formData, setFormData] = useState<TaskFormData>(emptyTaskFormData);
+  const [formData, setFormData] = useState<TaskFormData>(() =>
+    taskToEdit
+      ? {
+          title: taskToEdit.title,
+          description: taskToEdit.description ?? "",
+          priority: taskToEdit.priority,
+          status: taskToEdit.status,
+          dueDate: taskToEdit.dueDate ?? "",
+        }
+      : emptyTaskFormData
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (taskToEdit) {
-      setFormData({
-        title: taskToEdit.title,
-        description: taskToEdit.description ?? "",
-        priority: taskToEdit.priority,
-        status: taskToEdit.status,
-        dueDate: taskToEdit.dueDate ?? "",
-      });
-    } else {
-      setFormData(emptyTaskFormData);
-    }
-  }, [taskToEdit]);
 
   function handleChange(
     field: keyof TaskFormData,
@@ -44,13 +48,13 @@ export function TaskForm({ taskToEdit, onSubmit, onCancelEdit }: TaskFormProps) 
     setFormData((prev) => ({ ...prev, [field]: value }));
   }
 
-  async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setFormError(null);
 
     const error = validateTask(formData);
     if (error) { setFormError(error); return; }
-    
+
     setIsSubmitting(true);
     try {
       await onSubmit(formData);
@@ -125,7 +129,6 @@ export function TaskForm({ taskToEdit, onSubmit, onCancelEdit }: TaskFormProps) 
             onChange={(e) => handleChange("status", e.target.value)}
           >
             <option value="pending">Pendiente</option>
-            <option value="in-progress">En curso</option>
             <option value="completed">Completada</option>
           </select>
         </div>

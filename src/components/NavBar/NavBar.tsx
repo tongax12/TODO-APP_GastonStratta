@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../../services/firebase";
 import "./NavBar.css";
-import { useAuth } from "../../features/auth/Authenticator";
+import { useAuth } from "../../features/auth/useAuth";
 import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
 
 export function Navbar() {

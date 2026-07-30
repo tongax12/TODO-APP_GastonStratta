@@ -1,25 +1,7 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
-
-export type Theme = "light" | "dark";
+import { useEffect, useState, type ReactNode } from "react";
+import { ThemeContext, DEFAULT_THEME, type Theme } from "./themeContext";
 
 const STORAGE_KEY = "theme";
-const DEFAULT_THEME: Theme = "dark"; // oscuro por defecto la primera vez
-
-interface ThemeContextValue {
-  theme: Theme;
-  toggleTheme: () => void;
-}
-
-const ThemeContext = createContext<ThemeContextValue>({
-  theme: DEFAULT_THEME,
-  toggleTheme: () => {},
-});
 
 function getInitialTheme(): Theme {
   const stored = localStorage.getItem(STORAGE_KEY);
@@ -52,8 +34,4 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       {children}
     </ThemeContext.Provider>
   );
-}
-
-export function useTheme() {
-  return useContext(ThemeContext);
 }

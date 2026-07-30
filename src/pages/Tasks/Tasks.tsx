@@ -1,6 +1,6 @@
 import { FilteredTaskList } from "../../components/FilteredTaskList/FilteredTaskList";
 import EmailSummaryButton from "../../components/EmailSummaryButton/EmailSummaryButton";
-import { useAuth } from "../../features/auth/Authenticator";
+import { useAuth } from "../../features/auth/useAuth";
 import { useTasks } from "../../hooks/useTask";
 
 export function Tasks() {

@@ -57,7 +57,7 @@ function EmailSummaryButton({ todos, userEmail }: Props) {
             }
 
             setStatus("success")
-        } catch (error) {
+        } catch  {
             setStatus("error")
             setErrorMsg("No se pudo conectar con el servidor")
         }

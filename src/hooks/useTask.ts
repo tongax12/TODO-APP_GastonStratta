@@ -1,6 +1,6 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import type { Task, TaskFormData } from "../types/task";
-import { useAuth } from "../features/auth/Authenticator";
+import { useAuth } from "../features/auth/useAuth";
 import * as taskService from "../services/taskService";
 
 interface UseTasksResult {
@@ -18,36 +18,48 @@ export function useTasks(): UseTasksResult {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchTasks = useCallback(async () => {
-    if (!user) { setTasks([]); setIsLoading(false); return; }
-    setIsLoading(true);
-    try {
-      const data = await taskService.subscribeToTasks(user.uid);
-      setTasks(data);
+  useEffect(() => {
+    // Si no hay usuario, limpiamos el estado y desactivamos el loading
+    if (!user) {
+      setTasks([]);
       setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al cargar tareas.");
-    } finally {
       setIsLoading(false);
+      return;
     }
-  }, [user]);
 
-  useEffect(() => { fetchTasks(); }, [fetchTasks]);
+    setIsLoading(true);
+
+    // Nos suscribimos a los cambios en tiempo real
+    const unsubscribe = taskService.subscribeToTasks(
+      user.uid,
+      (newTasks) => {
+        setTasks(newTasks);
+        setError(null);
+        setIsLoading(false);
+      },
+      (err) => {
+        setError(err.message || "Error al cargar tareas.");
+        setIsLoading(false);
+      }
+    );
+
+    // Cancelamos la suscripción cuando el usuario cambia o el componente se desmonta
+    return () => {
+      unsubscribe();
+    };
+  }, [user]);
 
   async function createTask(data: TaskFormData) {
     if (!user) return;
     await taskService.createTask(user.uid, data);
-    await fetchTasks();
   }
 
   async function updateTask(id: string, data: Partial<TaskFormData>) {
     await taskService.updateTask(id, data);
-    await fetchTasks();
   }
 
   async function deleteTask(id: string) {
     await taskService.deleteTask(id);
-    await fetchTasks();
   }
 
   return { tasks, isLoading, error, createTask, updateTask, deleteTask };
