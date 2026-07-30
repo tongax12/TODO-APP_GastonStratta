@@ -178,6 +178,44 @@ Las variables requeridas son:
 
 ---
 
+## 🔒 Seguridad y Reglas de Acceso
+
+El proyecto implementa un modelo de seguridad por capas para garantizar que los datos estén protegidos tanto en la base de datos como en los endpoints de la API.
+
+---
+
+### 1. Reglas de Firestore 
+
+Para evitar accesos no autorizados a nivel de base de datos y garantizar el aislamiento multitenant (que el **Usuario A** no pueda leer ni modificar las tareas del **Usuario B**), la colección `tasks` cuenta con las siguientes restricciones definidas en el archivo [`firestore.rules`](./firestore.rules):
+
+- **Aislamiento de lectura y borrado (`read`, `delete`):** Solo permitido si el usuario está autenticado (`isSignedIn()`) y el campo `userId` del documento existente coincide con su UID (`isOwnerExisting()`).
+- **Creación segura (`create`):** Requiere autenticación, asignación explícita del usuario creador como dueño (`isOwnerIncoming()`) y la validación de la estructura del documento (`hasValidShape()`, exigiendo los campos `title`, `status` y `userId`).
+- **Edición controlada (`update`):** Garantiza que solo el propietario pueda modificar el documento y evita que se transfiera la propiedad de la tarea a otro usuario (`isOwnerExisting() && isOwnerIncoming()`).
+
+Verification / Prueba de Seguridad:
+Si un usuario autenticado intenta acceder directamente al SDK de Firestore desde la consola del navegador para consultar o modificar una tarea ajena:
+
+```javascript
+// Intentar leer la tarea del Usuario A estando logueado como Usuario B
+await getDoc(doc(db, "tasks", "ID_DE_TAREA_DEL_USUARIO_A"));
+```
+Firestore rechazará la operación arrojando el siguiente error:
+
+FirebaseError: [code=permission-denied]: Missing or insufficient permissions.
+
+2. Protección del Endpoint Servidor (/api/send-email)
+El endpoint serverless encargado del envío de resúmenes de correo electrónico (/api/send-email) implementa las siguientes medidas contra abusos y ataques de denegación de servicio (DoS):
+
+Validación de Token (Firebase Admin SDK): Las peticiones deben incluir un encabezado Authorization: Bearer <ID_TOKEN>. El servidor valida la firma y vigencia del token JWT mediante el Admin SDK antes de procesar el envío.
+
+Validación de Payload:
+
+Sintaxis de Email: Verifica mediante expresión regular que el campo to tenga un formato de correo válido.
+
+Límite de Longitud: El cuerpo del mensaje (summary) está restringido a un máximo de 5000 caracteres para prevenir consumo desmedido de cuota en AWS SES.
+
+---
+
 # ⚙ Instalación
 
 ## Clonar el repositorio
@@ -267,6 +305,13 @@ test:
 Durante el desarrollo del proyecto se utilizaron herramientas de Inteligencia Artificial como apoyo para tareas de documentación, resolución de dudas técnicas y revisión de código.
 
 El detalle del uso de estas herramientas puede consultarse en el archivo [UsoDeIA.md](./UsoDeIA.md).
+
+---
+
+# Aclaración 
+
+Para ejecutar localmente ,usando vercel dev, comentar el contenido del archivo vercel.json.
+El contenido del vercel.json está configurado para la app deployeada, pero localmente va a tirar error.
 
 ---
 

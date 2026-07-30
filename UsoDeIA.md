@@ -82,6 +82,35 @@ A veces el warning aparece cuando usás waitFor sin await
 
 Opción 4: Si usás userEvent pero sin await
 
+## Prompt enviado: ( resumen de los errores de eslint )
+
+Ejecuté en la terminal el comando npm run lint y me tiró los siguientes errores:
+
+(le pasé los errores)
+
+haceme una guía resumen de cada error.
+
+## Respuesta de la IA:
+
+- ThemeProvider.tsx — el error es porque el archivo exporta tanto el componente ThemeProvider como la función useTheme, y Fast Refresh (el hot-reload de Vite) necesita que un archivo que exporta componentes solo exporte componentes.
+
+- Authenticator.tsx tiene el mismo error, en el mismo patrón (exporta el Provider + el hook useAuth).
+
+- api/send-email.ts (línea 45, el any).
+
+- EmailSummaryButton.tsx (línea 60, la variable error sin usar).
+
+- taskService.ts (línea 33, falta el { cause: err } al relanzar el error).
+
+- RequireAuth.test.tsx (línea 27, el any).
+
+- test-utils.tsx completo (el error de Fast Refresh acá es un falso positivo — es un archivo de test, no de la app, así que la forma correcta de arreglarlo es excluir src/test/** del lint rule, no tocar el código).
+
+- eslint.config.js (para hacer esa exclusión de test-utils correctamente, en vez de poner un disable suelto).
+
+- Este (react-hooks/set-state-in-effect) es un lint nuevo y bastante estricto — marca un patrón que técnicamente puede causar renders en cascada, pero que en tus tres casos (FilteredTaskList, TaskForm, useTask) es exactamente el patrón recomendado por la documentación de React para sincronizar estado local con props/datos externos (sección "Adjusting some state when a prop changes").
+
+
 ## Otras ayudas de la IA:
 
 -También consulté errores o warnings que me salían en la escritura del código y que no entendía. 
